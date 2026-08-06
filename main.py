@@ -162,95 +162,98 @@ async def process_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                 continue
 
             for message in messages:
-                # Process text messages
-                msg_type = message.get("type")
-                if msg_type != "text":
-                    logger.info(f"Skipping non-text message type: {msg_type}")
-                    continue
+                try:
+                    # Process text messages
+                    msg_type = message.get("type")
+                    if msg_type != "text":
+                        logger.info(f"Skipping non-text message type: {msg_type}")
+                        continue
 
-                customer_phone = message.get("from")
-                user_text = message.get("text", {}).get("body", "").strip()
+                    customer_phone = message.get("from")
+                    user_text = message.get("text", {}).get("body", "").strip()
 
-                if not customer_phone or not user_text:
-                    continue
+                    if not customer_phone or not user_text:
+                        continue
 
-                logger.info(
-                    f"Message received on Phone Number ID '{phone_number_id}' "
-                    f"from '{customer_phone}': '{user_text}'"
-                )
-
-                # -----------------------------------------------------------
-                # TENANT RESOLVER
-                # -----------------------------------------------------------
-                stmt = select(Tenant).where(Tenant.whatsapp_phone_number_id == phone_number_id)
-                result = await db.execute(stmt)
-                tenant = result.scalar_one_or_none()
-
-                if not tenant:
-                    logger.error(f"No tenant found matching whatsapp_phone_number_id='{phone_number_id}'")
-                    continue
-
-                logger.info(f"Resolved tenant: ID={tenant.id}, Business='{tenant.business_name}'")
-
-                # Fetch past chat history for context (up to 10 previous turns)
-                history_stmt = (
-                    select(ChatHistory)
-                    .where(
-                        ChatHistory.tenant_id == tenant.id,
-                        ChatHistory.customer_phone_number == customer_phone
+                    logger.info(
+                        f"Message received on Phone Number ID '{phone_number_id}' "
+                        f"from '{customer_phone}': '{user_text}'"
                     )
-                    .order_by(ChatHistory.created_at.asc())
-                )
-                history_res = await db.execute(history_stmt)
-                history_records = history_res.scalars().all()
 
-                formatted_history = [
-                    {"role": item.role, "content": item.content} for item in history_records
-                ]
+                    # -----------------------------------------------------------
+                    # TENANT RESOLVER
+                    # -----------------------------------------------------------
+                    stmt = select(Tenant).where(Tenant.whatsapp_phone_number_id == phone_number_id)
+                    result = await db.execute(stmt)
+                    tenant = result.scalar_one_or_none()
 
-                # Generate Multilingual AI Response (gpt-4o-mini)
-                ai_reply, is_handoff_requested = await generate_ai_response(
-                    system_prompt=tenant.system_prompt,
-                    knowledge_base=tenant.knowledge_base,
-                    chat_history=formatted_history,
-                    user_message=user_text
-                )
+                    if not tenant:
+                        logger.error(f"No tenant found matching whatsapp_phone_number_id='{phone_number_id}'")
+                        continue
 
-                # Store user message & AI response in database
-                user_history = ChatHistory(
-                    tenant_id=tenant.id,
-                    customer_phone_number=customer_phone,
-                    role="user",
-                    content=user_text
-                )
-                ai_history = ChatHistory(
-                    tenant_id=tenant.id,
-                    customer_phone_number=customer_phone,
-                    role="assistant",
-                    content=ai_reply
-                )
-                db.add(user_history)
-                db.add(ai_history)
-                await db.commit()
+                    logger.info(f"Resolved tenant: ID={tenant.id}, Business='{tenant.business_name}'")
 
-                # Send AI response back to customer via Meta Cloud API
-                await send_whatsapp_message(
-                    phone_number_id=tenant.whatsapp_phone_number_id,
-                    recipient_phone=customer_phone,
-                    message_text=ai_reply,
-                    meta_access_token=tenant.meta_access_token
-                )
+                    # Fetch past chat history for context (up to 10 previous turns)
+                    history_stmt = (
+                        select(ChatHistory)
+                        .where(
+                            ChatHistory.tenant_id == tenant.id,
+                            ChatHistory.customer_phone_number == customer_phone
+                        )
+                        .order_by(ChatHistory.created_at.asc())
+                    )
+                    history_res = await db.execute(history_stmt)
+                    history_records = history_res.scalars().all()
 
-                # Handle Human Handoff if requested
-                if is_handoff_requested and tenant.human_handoff_number:
-                    logger.info(f"Triggering human handoff notification to {tenant.human_handoff_number}")
-                    await notify_human_agent(
+                    formatted_history = [
+                        {"role": item.role, "content": item.content} for item in history_records
+                    ]
+
+                    # Generate Multilingual AI Response (gpt-4o-mini / Local Simulator)
+                    ai_reply, is_handoff_requested = await generate_ai_response(
+                        system_prompt=tenant.system_prompt,
+                        knowledge_base=tenant.knowledge_base,
+                        chat_history=formatted_history,
+                        user_message=user_text
+                    )
+
+                    # Store user message & AI response in database
+                    user_history = ChatHistory(
+                        tenant_id=tenant.id,
+                        customer_phone_number=customer_phone,
+                        role="user",
+                        content=user_text
+                    )
+                    ai_history = ChatHistory(
+                        tenant_id=tenant.id,
+                        customer_phone_number=customer_phone,
+                        role="assistant",
+                        content=ai_reply
+                    )
+                    db.add(user_history)
+                    db.add(ai_history)
+                    await db.commit()
+
+                    # Send AI response back to customer via Meta Cloud API
+                    await send_whatsapp_message(
                         phone_number_id=tenant.whatsapp_phone_number_id,
-                        handoff_number=tenant.human_handoff_number,
-                        customer_phone=customer_phone,
-                        last_user_message=user_text,
+                        recipient_phone=customer_phone,
+                        message_text=ai_reply,
                         meta_access_token=tenant.meta_access_token
                     )
+
+                    # Handle Human Handoff if requested
+                    if is_handoff_requested and tenant.human_handoff_number:
+                        logger.info(f"Triggering human handoff notification to {tenant.human_handoff_number}")
+                        await notify_human_agent(
+                            phone_number_id=tenant.whatsapp_phone_number_id,
+                            handoff_number=tenant.human_handoff_number,
+                            customer_phone=customer_phone,
+                            last_user_message=user_text,
+                            meta_access_token=tenant.meta_access_token
+                        )
+                except Exception as msg_err:
+                    logger.error(f"Error processing message from {customer_phone}: {msg_err}")
 
     # Meta requires a 200 OK HTTP response to acknowledge receipt of event
     return Response(content="EVENT_RECEIVED", status_code=200)
