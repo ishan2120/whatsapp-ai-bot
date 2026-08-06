@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
             wasala_tenant = Tenant(
                 business_name="Wasala Nature Resort",
                 whatsapp_phone_number_id="1157440684128924",
-                meta_access_token="EAAjfYY4wqiYBSORE4QYSFD9QGUt1QTMRn4ZCRWfmxXyOMnG1Baixqobu5szEbWG7554T88KqsSyV6oifZABeZCfJE8HRPZCUXrQ7SRKXgZCHp2r3qYgOZB9TZAHovFd39ZBKTL3EkNqCNaiWl9qdEWtXp3JT59oL9bJ4bRm0ZBSIE1qPTbHZCa4WQVSAFJR9bnhdZBQbfIll6glfYTq3aRbXrYIUeEk9tF27ou9zgEYbW7Xk4recf8gZBQzq1JDsDsr1zsSqouSibaimJWS66w4B3XFZBcPDT4wZDZD",
+                meta_access_token="EAAjfYY4wqiYBSFUDPvPZAcBBEdDXNI8bEAlvLqMGsALEtFAVKniNFPLU5jdOodS53bYOyOettApsQQIxflC0Ca4ywHRayUnbZBtnHfxiKJ5DJdEg5ZBsafyZBLrbw4byqJPhqJdAwPiCQiX2HqCAZCSUekdKcrqz2yiAzPPCNV3JECNZBXVNmZBx9CxsxSSxY54PZCGQStST56bFbEgggTCRFDkh5HWg8MbO5ECctF2SPeVpSZAXETkg3e2p608BdizzYKkWnREDXAoPTydVgJWNWZCIQG",
                 system_prompt=(
                     "You are the official 24/7 AI Concierge for Wasala Nature Resort in Sri Lanka. "
                     "Respond warmly and politely in the user's language (English, Sinhala, or Singlish)."

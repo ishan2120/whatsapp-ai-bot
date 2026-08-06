@@ -7,7 +7,7 @@ from sqlalchemy import select
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("update_token")
 
-TOKEN = "EAAjfYY4wqiYBSORE4QYSFD9QGUt1QTMRn4ZCRWfmxXyOMnG1Baixqobu5szEbWG7554T88KqsSyV6oifZABeZCfJE8HRPZCUXrQ7SRKXgZCHp2r3qYgOZB9TZAHovFd39ZBKTL3EkNqCNaiWl9qdEWtXp3JT59oL9bJ4bRm0ZBSIE1qPTbHZCa4WQVSAFJR9bnhdZBQbfIll6glfYTq3aRbXrYIUeEk9tF27ou9zgEYbW7Xk4recf8gZBQzq1JDsDsr1zsSqouSibaimJWS66w4B3XFZBcPDT4wZDZD"
+TOKEN = "EAAjfYY4wqiYBSFUDPvPZAcBBEdDXNI8bEAlvLqMGsALEtFAVKniNFPLU5jdOodS53bYOyOettApsQQIxflC0Ca4ywHRayUnbZBtnHfxiKJ5DJdEg5ZBsafyZBLrbw4byqJPhqJdAwPiCQiX2HqCAZCSUekdKcrqz2yiAzPPCNV3JECNZBXVNmZBx9CxsxSSxY54PZCGQStST56bFbEgggTCRFDkh5HWg8MbO5ECctF2SPeVpSZAXETkg3e2p608BdizzYKkWnREDXAoPTydVgJWNWZCIQG"
 PHONE_ID = "1157440684128924"
 
 async def update_token():
@@ -21,7 +21,7 @@ async def update_token():
 
         tenant.meta_access_token = TOKEN
         await session.commit()
-        logger.info(f"SUCCESS: Meta Access Token updated for tenant '{tenant.business_name}' (ID: {tenant.id})!")
+        logger.info(f"SUCCESS: Permanent Meta Access Token updated for tenant '{tenant.business_name}' (ID: {tenant.id})!")
 
 if __name__ == "__main__":
     asyncio.run(update_token())
