@@ -25,9 +25,39 @@ logger = logging.getLogger("uvicorn.error")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan event handler to initialize database tables on startup."""
+    """Lifespan event handler to initialize database tables and seed tenants on startup."""
     logger.info("Starting up WhatsApp AI Chatbot service...")
     await init_db()
+
+    # Automatically seed Wasala Nature Resort tenant if not present
+    async with AsyncSessionLocal() as session:
+        stmt = select(Tenant).where(Tenant.whatsapp_phone_number_id == "1157440684128924")
+        existing = (await session.execute(stmt)).scalar_one_or_none()
+        if not existing:
+            wasala_tenant = Tenant(
+                business_name="Wasala Nature Resort",
+                whatsapp_phone_number_id="1157440684128924",
+                meta_access_token="EAAjfYY4wqiYBSORE4QYSFD9QGUt1QTMRn4ZCRWfmxXyOMnG1Baixqobu5szEbWG7554T88KqsSyV6oifZABeZCfJE8HRPZCUXrQ7SRKXgZCHp2r3qYgOZB9TZAHovFd39ZBKTL3EkNqCNaiWl9qdEWtXp3JT59oL9bJ4bRm0ZBSIE1qPTbHZCa4WQVSAFJR9bnhdZBQbfIll6glfYTq3aRbXrYIUeEk9tF27ou9zgEYbW7Xk4recf8gZBQzq1JDsDsr1zsSqouSibaimJWS66w4B3XFZBcPDT4wZDZD",
+                system_prompt=(
+                    "You are the official 24/7 AI Concierge for Wasala Nature Resort in Sri Lanka. "
+                    "Respond warmly and politely in the user's language (English, Sinhala, or Singlish)."
+                ),
+                knowledge_base=(
+                    "Property: Wasala Nature Resort\n"
+                    "Location: Bentota, Sri Lanka\n"
+                    "Check-In: 2:00 PM | Check-Out: 12:00 PM\n"
+                    "Room Rates (Breakfast Included):\n"
+                    "- Deluxe Ocean View: Rs. 35,000 / night\n"
+                    "- Executive Suite: Rs. 55,000 / night\n"
+                    "- Family Villa: Rs. 70,000 / night\n"
+                    "Dining & Amenities: 24/7 Room service, Oceanfront Seafood Buffet, Pool open 6 AM - 8 PM."
+                ),
+                human_handoff_number="+94779998877"
+            )
+            session.add(wasala_tenant)
+            await session.commit()
+            logger.info("Successfully auto-seeded Wasala Nature Resort tenant into database!")
+
     yield
     logger.info("Shutting down WhatsApp AI Chatbot service...")
 
