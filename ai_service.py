@@ -85,22 +85,12 @@ async def generate_ai_response(
 ) -> Tuple[str, bool]:
     """
     Generates AI response using OpenAI gpt-4o-mini, with automatic fallback
-    to Smart Knowledge-Base Simulator if OpenAI credits are exhausted.
+    to Smart Knowledge-Base Simulator if OpenAI key is unconfigured or credits exhausted.
     """
-    full_system_instructions = (
-        f"{system_prompt}\n\n"
-        f"--- KNOWLEDGE BASE ---\n"
-        f"{knowledge_base}\n"
-        f"----------------------\n"
-    )
+    api_key = settings.OPENAI_API_KEY.strip() if settings.OPENAI_API_KEY else ""
 
-    messages = [{"role": "system", "content": full_system_instructions}]
-    for msg in chat_history[-10:]:
-        messages.append({"role": msg["role"], "content": msg["content"]})
-    messages.append({"role": "user", "content": user_message})
-
-    # If OPENAI_API_KEY is not configured or placeholder, use Local Simulator
-    if not settings.OPENAI_API_KEY or "placeholder" in settings.OPENAI_API_KEY:
+    # Fallback immediately if key is placeholder or empty
+    if not api_key or "placeholder" in api_key:
         reply = smart_knowledge_base_search(user_message, knowledge_base, system_prompt)
         is_handoff = "[HUMAN_HANDOFF_REQUESTED]" in reply
         reply = reply.replace("[HUMAN_HANDOFF_REQUESTED]", "").strip()
@@ -108,7 +98,18 @@ async def generate_ai_response(
 
     # Attempt OpenAI gpt-4o-mini API call
     try:
-        client = get_openai_client()
+        client = AsyncOpenAI(api_key=api_key)
+        full_system_instructions = (
+            f"{system_prompt}\n\n"
+            f"--- KNOWLEDGE BASE ---\n"
+            f"{knowledge_base}\n"
+            f"----------------------\n"
+        )
+        messages = [{"role": "system", "content": full_system_instructions}]
+        for msg in chat_history[-10:]:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        messages.append({"role": "user", "content": user_message})
+
         response = await client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
@@ -121,7 +122,7 @@ async def generate_ai_response(
         return reply_content, is_human_handoff
 
     except Exception as e:
-        logger.warning(f"OpenAI API Call Error ({e}). Falling back to Smart Knowledge-Base Simulator.")
+        logger.warning(f"OpenAI API Error ({e}). Using Smart Knowledge-Base Simulator fallback.")
         reply = smart_knowledge_base_search(user_message, knowledge_base, system_prompt)
         is_handoff = "[HUMAN_HANDOFF_REQUESTED]" in reply
         reply = reply.replace("[HUMAN_HANDOFF_REQUESTED]", "").strip()
