@@ -35,22 +35,27 @@ async def lifespan(app: FastAPI):
         existing = (await session.execute(stmt)).scalar_one_or_none()
         if not existing:
             wasala_tenant = Tenant(
-                business_name="Wasala Nature Resort",
+                business_name="Wasala Nature Resort - Banquet & Events",
                 whatsapp_phone_number_id="1157440684128924",
                 meta_access_token="EAAjfYY4wqiYBSFUDPvPZAcBBEdDXNI8bEAlvLqMGsALEtFAVKniNFPLU5jdOodS53bYOyOettApsQQIxflC0Ca4ywHRayUnbZBtnHfxiKJ5DJdEg5ZBsafyZBLrbw4byqJPhqJdAwPiCQiX2HqCAZCSUekdKcrqz2yiAzPPCNV3JECNZBXVNmZBx9CxsxSSxY54PZCGQStST56bFbEgggTCRFDkh5HWg8MbO5ECctF2SPeVpSZAXETkg3e2p608BdizzYKkWnREDXAoPTydVgJWNWZCIQG",
                 system_prompt=(
-                    "You are the official 24/7 AI Concierge for Wasala Nature Resort in Sri Lanka. "
-                    "Respond warmly and politely in the user's language (English, Sinhala, or Singlish)."
+                    "You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. "
+                    "Respond warmly in the user's language (English, Sinhala, or Singlish). "
+                    "Provide accurate information on wedding packages, per head prices, hall capacity, food menus, and PDF brochures."
                 ),
                 knowledge_base=(
-                    "Property: Wasala Nature Resort\n"
-                    "Location: Bentota, Sri Lanka\n"
-                    "Check-In: 2:00 PM | Check-Out: 12:00 PM\n"
-                    "Room Rates (Breakfast Included):\n"
-                    "- Deluxe Ocean View: Rs. 35,000 / night\n"
-                    "- Executive Suite: Rs. 55,000 / night\n"
-                    "- Family Villa: Rs. 70,000 / night\n"
-                    "Dining & Amenities: 24/7 Room service, Oceanfront Seafood Buffet, Pool open 6 AM - 8 PM."
+                    "=== WASALA NATURE RESORT - BANQUET & EVENTS MASTER KNOWLEDGE BASE ===\n\n"
+                    "🏛️ BANQUET HALLS & SEATING CAPACITY:\n"
+                    "1. Grand Royal Ballroom: Up to 650 guests (Banquet setup) | AC, Chandeliers, Stage, Bridal Suite.\n"
+                    "2. Lotus Pavilion (Outdoor Lakefront Venue): Up to 350 guests | Open-air lakefront view.\n\n"
+                    "🍽️ WEDDING & BANQUET PACKAGES (Per Head Pricing):\n"
+                    "- Gold Buffet Package: LKR 5,500 net per head (Welcome Drink, Buffet, Desserts, Bridal Room)\n"
+                    "- Platinum Luxury Package: LKR 7,500 net per head (Seafood & Meat Buffet, Live Stations, Honeymoon Suite)\n"
+                    "- Corporate Conference Package: LKR 3,800 net per head (Teas, Lunch, Projector, Sound)\n\n"
+                    "📄 OFFICIAL BROCHURES & DOCUMENTS:\n"
+                    "- 2026 Wedding Packages Brochure PDF: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf\n\n"
+                    "📋 POLICIES:\n"
+                    "- Booking Deposit: 25% to hold date. Noise cutoff: 11:30 PM."
                 ),
                 human_handoff_number="+94779998877"
             )
