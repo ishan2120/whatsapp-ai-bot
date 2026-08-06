@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wasala Nature Resort - AI Bot Admin Portal</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brand i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .header-title {
+            margin-bottom: 2rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .card-header i {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 220px;
+            font-family: monospace;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        /* Quick Price Inputs Grid */
+        .price-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .input-icon-group {
+            position: relative;
+        }
+
+        .input-icon-group span {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .input-icon-group input {
+            padding-left: 3.5rem;
+        }
+
+        /* Buttons */
+        .btn-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast i {
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fa-solid fa-robot"></i>
+            <span>Wasala Nature Resort - AI Bot Manager</span>
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>24/7 Cloud AI Bot Live</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header-title">
+            <h1>Package Pricing & Knowledge Control Center</h1>
+            <p>Customize your hotel package rates, room prices, and PDF brochure links in real-time for WhatsApp guests.</p>
+        </div>
+
+        <div class="grid">
+            <!-- Quick Price Editor -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-tags"></i>
+                    <h2>Quick Package Price Adjuster</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>Business / Bot Name</label>
+                    <input type="text" id="businessName" class="form-control" value="Wasala Nature Resort - Banquet & Events">
+                </div>
+
+                <div class="price-grid">
+                    <div class="form-group">
+                        <label>Gold Buffet (Per Head)</label>
+                        <div class="input-icon-group">
+                            <span>LKR</span>
+                            <input type="number" id="priceGold" class="form-control" value="5500" oninput="syncToKnowledgeBase()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Platinum Luxury (Per Head)</label>
+                        <div class="input-icon-group">
+                            <span>LKR</span>
+                            <input type="number" id="pricePlatinum" class="form-control" value="7500" oninput="syncToKnowledgeBase()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="price-grid">
+                    <div class="form-group">
+                        <label>Silver Budget (Per Head)</label>
+                        <div class="input-icon-group">
+                            <span>LKR</span>
+                            <input type="number" id="priceSilver" class="form-control" value="4200" oninput="syncToKnowledgeBase()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Corporate Rate (Per Head)</label>
+                        <div class="input-icon-group">
+                            <span>LKR</span>
+                            <input type="number" id="priceCorporate" class="form-control" value="3800" oninput="syncToKnowledgeBase()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Wedding PDF Brochure Link</label>
+                    <input type="url" id="brochureUrl" class="form-control" value="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" oninput="syncToKnowledgeBase()">
+                </div>
+
+                <div class="form-group">
+                    <label>Human Manager Handoff Phone Number</label>
+                    <input type="text" id="handoffNumber" class="form-control" value="+94779998877">
+                </div>
+            </div>
+
+            <!-- Knowledge Base Raw Editor -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-brain"></i>
+                    <h2>AI Bot Training Knowledge Base</h2>
+                </div>
+
+                <div class="form-group">
+                    <label>System Persona Prompt</label>
+                    <input type="text" id="systemPrompt" class="form-control" value="You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. Respond warmly in English, Sinhala, or Singlish.">
+                </div>
+
+                <div class="form-group">
+                    <label>Full Training Memory (Knowledge Base)</label>
+                    <textarea id="knowledgeBase" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="loadTenantData()">
+                <i class="fa-solid fa-arrows-rotate"></i> Reload Current
+            </button>
+            <button class="btn btn-primary" onclick="saveTenantData()">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Save & Sync to Live AI Bot
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Changes saved and synced to 24/7 AI Bot!</span>
+    </div>
+
+    <script>
+        const API_URL = '/api/tenants/1';
+
+        async function loadTenantData() {
+            try {
+                const res = await fetch(API_URL);
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('businessName').value = data.business_name || '';
+                    document.getElementById('systemPrompt').value = data.system_prompt || '';
+                    document.getElementById('knowledgeBase').value = data.knowledge_base || '';
+                    document.getElementById('handoffNumber').value = data.human_handoff_number || '';
+                    showToast('Data reloaded from server');
+                }
+            } catch (err) {
+                console.error('Failed to load data:', err);
+            }
+        }
+
+        function syncToKnowledgeBase() {
+            const gold = document.getElementById('priceGold').value;
+            const platinum = document.getElementById('pricePlatinum').value;
+            const silver = document.getElementById('priceSilver').value;
+            const corporate = document.getElementById('priceCorporate').value;
+            const brochure = document.getElementById('brochureUrl').value;
+
+            const kbText = `=== WASALA NATURE RESORT - BANQUET & EVENTS MASTER KNOWLEDGE BASE ===
+
+🏛️ BANQUET HALLS & SEATING CAPACITY:
+1. Grand Royal Ballroom: Up to 650 guests (Banquet setup) | AC, Chandeliers, Stage, Bridal Suite.
+2. Lotus Pavilion (Outdoor Lakefront Venue): Up to 350 guests | Open-air lakefront view.
+
+🍽️ WEDDING & BANQUET PACKAGES (Per Head Pricing):
+- Gold Buffet Package: LKR ${gold} net per head (Welcome Drink, Buffet, Desserts, Bridal Room)
+- Platinum Luxury Package: LKR ${platinum} net per head (Seafood & Meat Buffet, Live Stations, Honeymoon Suite)
+- Silver Budget Package: LKR ${silver} net per head (Welcome Drink, Fried Rice, Chicken, Ice Cream)
+- Corporate Conference Package: LKR ${corporate} net per head (Teas, Lunch, Projector, Sound)
+
+📄 OFFICIAL BROCHURES & DOCUMENTS:
+- 2026 Wedding Packages Brochure PDF: ${brochure}
+
+📋 POLICIES:
+- Booking Deposit: 25% to hold date. Noise cutoff: 11:30 PM.`;
+
+            document.getElementById('knowledgeBase').value = kbText;
+        }
+
+        async function saveTenantData() {
+            const payload = {
+                business_name: document.getElementById('businessName').value,
+                system_prompt: document.getElementById('systemPrompt').value,
+                knowledge_base: document.getElementById('knowledgeBase').value,
+                human_handoff_number: document.getElementById('handoffNumber').value
+            };
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    showToast('✅ Saved & Synced Live to WhatsApp AI Bot!');
+                } else {
+                    showToast('❌ Failed to save changes.');
+                }
+            } catch (err) {
+                console.error('Save error:', err);
+                showToast('❌ Server error saving data.');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTenantData();
+        });
+    </script>
+</body>
+</html>

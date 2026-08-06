@@ -83,11 +83,21 @@ app.add_middleware(
 )
 
 
+from fastapi.responses import FileResponse
+
+@app.get("/admin", tags=["Admin Portal"])
+@app.get("/dashboard", tags=["Admin Portal"])
+async def get_admin_dashboard():
+    """Serves the modern Admin Control Center for hotel managers to edit package prices & details."""
+    return FileResponse("static/admin.html")
+
+
 @app.get("/", tags=["Health"])
 async def root():
     return {
         "status": "online",
         "service": "Multi-Tenant WhatsApp AI Chatbot Backend",
+        "admin_portal": "/admin",
         "docs": "/docs"
     }
 
