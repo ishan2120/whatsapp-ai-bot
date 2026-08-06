@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from config import settings
-from database import init_db, get_db
+from database import init_db, get_db, AsyncSessionLocal
 from models import Tenant, ChatHistory
 from schemas import (
     TenantCreate,
