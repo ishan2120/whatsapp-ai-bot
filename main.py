@@ -83,13 +83,17 @@ app.add_middleware(
 )
 
 
-from fastapi.responses import FileResponse
+import os
+from fastapi.responses import FileResponse, HTMLResponse
 
 @app.get("/admin", tags=["Admin Portal"])
 @app.get("/dashboard", tags=["Admin Portal"])
 async def get_admin_dashboard():
     """Serves the modern Admin Control Center for hotel managers to edit package prices & details."""
-    return FileResponse("static/admin.html")
+    admin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "admin.html")
+    if os.path.exists(admin_path):
+        return FileResponse(admin_path)
+    return HTMLResponse("<h2>Admin Portal Error: static/admin.html not found</h2>", status_code=404)
 
 
 @app.get("/", tags=["Health"])
