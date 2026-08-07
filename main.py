@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
             wasala_tenant = Tenant(
                 business_name="Wasala Nature Resort - Banquet & Events",
                 whatsapp_phone_number_id="1157440684128924",
-                meta_access_token="EAAjfYY4wqiYBSFUDPvPZAcBBEdDXNI8bEAlvLqMGsALEtFAVKniNFPLU5jdOodS53bYOyOettApsQQIxflC0Ca4ywHRayUnbZBtnHfxiKJ5DJdEg5ZBsafyZBLrbw4byqJPhqJdAwPiCQiX2HqCAZCSUekdKcrqz2yiAzPPCNV3JECNZBXVNmZBx9CxsxSSxY54PZCGQStST56bFbEgggTCRFDkh5HWg8MbO5ECctF2SPeVpSZAXETkg3e2p608BdizzYKkWnREDXAoPTydVgJWNWZCIQG",
+                meta_access_token="EAAjfYY4wqiYBSOuuWKVaD4zuCG9qZBMZCLw89LeAwyZAqf81yEzuVitCQjWIeIP2bIVZBRPZAwp5eFnnLsTDDbgVAraB199PxB6rrWFXaAqRblCT9eKSHSf1bHktr4lEYjJwsFQrezxH5kFzUQ6B49yPl3oXlppDcn2Pg4pbZBNzXXvrX9aIdRMBhXAZATkqd37KkZCeZArj53kyHolBTwoZAhu99ZAkGOS8Mon0D444z31yBtaqr2mEC48hZCxIRJ4ZCMB1XSYWZAYuUIH3WvTamZAUSEmt5AZA",
                 system_prompt=(
                     "You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. "
                     "Respond warmly in the user's language (English, Sinhala, or Singlish). "
