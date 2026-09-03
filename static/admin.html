@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wasala Nature Resort - AI Bot Admin Portal</title>
+    <title>Wasala Nature Resort - Banquet Pricing & Knowledge Control Center</title>
     <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,6 +16,9 @@
             --primary: #6366f1;
             --primary-hover: #4f46e5;
             --accent: #10b981;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --premier: #ec4899;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --danger: #ef4444;
@@ -90,7 +93,7 @@
 
         /* Container */
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 2rem auto;
             padding: 0 1.5rem;
             flex: 1;
@@ -112,19 +115,6 @@
             font-size: 0.95rem;
         }
 
-        /* Grid Layout */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Card Component */
         .card {
             background: var(--card-bg);
@@ -133,6 +123,7 @@
             border-radius: 1rem;
             padding: 1.75rem;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
         }
 
         .card-header {
@@ -152,6 +143,65 @@
         .card-header h2 {
             font-size: 1.15rem;
             font-weight: 600;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table.pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        table.pricing-table th, table.pricing-table td {
+            padding: 0.85rem 0.75rem;
+            text-align: center;
+            border: 1px solid var(--card-border);
+        }
+
+        table.pricing-table th {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        table.pricing-table tr.silver-row { background: rgba(148, 163, 184, 0.05); }
+        table.pricing-table tr.gold-row { background: rgba(245, 158, 11, 0.05); }
+        table.pricing-table tr.premier-row { background: rgba(236, 72, 153, 0.05); }
+
+        .menu-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.4rem;
+        }
+
+        .silver-badge { background: rgba(148, 163, 184, 0.2); color: var(--silver); }
+        .gold-badge { background: rgba(245, 158, 11, 0.2); color: var(--gold); }
+        .premier-badge { background: rgba(236, 72, 153, 0.2); color: var(--premier); }
+
+        .table-input {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 0.4rem;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .table-input:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         /* Form Elements */
@@ -187,53 +237,50 @@
         }
 
         textarea.form-control {
-            min-height: 220px;
+            min-height: 350px;
             font-family: monospace;
             line-height: 1.5;
             resize: vertical;
         }
 
-        /* Quick Price Inputs Grid */
-        .price-grid {
+        /* Grid Layout */
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
-        .input-icon-group {
-            position: relative;
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
         }
 
-        .input-icon-group span {
-            position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .input-icon-group input {
-            padding-left: 3.5rem;
+        @media (max-width: 900px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Buttons */
         .btn-container {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
+            position: sticky;
+            bottom: 1.5rem;
+            z-index: 90;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.85rem 1.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.95rem;
-            font-weight: 600;
+            padding: 0.95rem 2rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             transition: all 0.2s ease;
@@ -242,30 +289,31 @@
         .btn-primary {
             background-color: var(--primary);
             color: white;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
         }
 
         .btn-primary:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 41, 59, 0.9);
             color: var(--text-main);
             border: 1px solid var(--card-border);
+            backdrop-filter: blur(8px);
         }
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Notification Toast */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: var(--card-bg);
+            background: rgba(30, 41, 59, 0.95);
             border: 1px solid var(--accent);
             color: white;
             padding: 1rem 1.5rem;
@@ -294,98 +342,169 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">
-            <i class="fa-solid fa-robot"></i>
-            <span>Wasala Nature Resort - AI Bot Manager</span>
+            <i class="fa-solid fa-hotel"></i>
+            <span>Wasala Nature Resort - Banquet Pricing & Knowledge Control Center</span>
         </div>
         <div class="status-badge">
             <div class="status-dot"></div>
-            <span>24/7 Cloud AI Bot Live</span>
+            <span>WhatsApp AI Bot Active</span>
         </div>
     </nav>
 
-    <!-- Main Container -->
+    <!-- Container -->
     <div class="container">
         <div class="header-title">
-            <h1>Package Pricing & Knowledge Control Center</h1>
-            <p>Customize your hotel package rates, room prices, and PDF brochure links in real-time for WhatsApp guests.</p>
+            <h1>Banquet Package Matrix & AI Knowledge Base Manager</h1>
+            <p>Directly customize your Silver, Gold, and Premier package rates across Grand Ballroom & Starlight Ballroom, Extra Plate prices, and Per-Head breakdowns.</p>
         </div>
 
-        <div class="grid">
-            <!-- Quick Price Editor -->
+        <!-- 1. Fixed Pax Package Rates Matrix -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-table-cells"></i>
+                <h2>1. Official Banquet Package Rates Matrix (Total LKR)</h2>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="pricing-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width: 140px;">Menu Type</th>
+                            <th colspan="2">100 Pax</th>
+                            <th colspan="2">150 Pax</th>
+                            <th rowspan="2">200 Pax</th>
+                            <th rowspan="2">250 Pax</th>
+                            <th rowspan="2">300 Pax</th>
+                        </tr>
+                        <tr>
+                            <th>Grand Ballroom</th>
+                            <th>Starlight Ballroom</th>
+                            <th>Grand Ballroom</th>
+                            <th>Starlight Ballroom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Silver Row -->
+                        <tr class="silver-row">
+                            <td>
+                                <span class="menu-badge silver-badge">
+                                    <i class="fa-solid fa-gem"></i> Silver
+                                </span>
+                            </td>
+                            <td><input type="text" id="silver_100_grand" class="table-input" value="Rs.539,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_100_star" class="table-input" value="Rs.479,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_150_grand" class="table-input" value="Rs.708,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_150_star" class="table-input" value="Rs.678,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_200" class="table-input" value="Rs.876,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_250" class="table-input" value="Rs.1,075,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="silver_300" class="table-input" value="Rs.1,273,500" onchange="autoGenerateKnowledgeBase()"></td>
+                        </tr>
+
+                        <!-- Gold Row -->
+                        <tr class="gold-row">
+                            <td>
+                                <span class="menu-badge gold-badge">
+                                    <i class="fa-solid fa-crown"></i> Gold
+                                </span>
+                            </td>
+                            <td><input type="text" id="gold_100_grand" class="table-input" value="Rs.589,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_100_star" class="table-input" value="Rs.529,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_150_grand" class="table-input" value="Rs.783,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_150_star" class="table-input" value="Rs.753,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_200" class="table-input" value="Rs.976,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_250" class="table-input" value="Rs.1,200,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="gold_300" class="table-input" value="Rs.1,423,500" onchange="autoGenerateKnowledgeBase()"></td>
+                        </tr>
+
+                        <!-- Premier Row -->
+                        <tr class="premier-row">
+                            <td>
+                                <span class="menu-badge premier-badge">
+                                    <i class="fa-solid fa-star"></i> Premier
+                                </span>
+                            </td>
+                            <td><input type="text" id="premier_100_grand" class="table-input" value="Rs.709,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_100_star" class="table-input" value="Rs.649,000" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_150_grand" class="table-input" value="Rs.917,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_150_star" class="table-input" value="Rs.887,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_200" class="table-input" value="Rs.1,143,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_250" class="table-input" value="Rs.1,397,500" onchange="autoGenerateKnowledgeBase()"></td>
+                            <td><input type="text" id="premier_300" class="table-input" value="Rs.1,647,500" onchange="autoGenerateKnowledgeBase()"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Extra Plate Rates & Per Head Rates -->
+        <div class="grid-2">
+            <!-- Extra Plate Rates -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa-solid fa-tags"></i>
-                    <h2>Quick Package Price Adjuster</h2>
+                    <i class="fa-solid fa-utensils"></i>
+                    <h2>Extra Plate Rates (Per Extra Guest)</h2>
                 </div>
-
                 <div class="form-group">
-                    <label>Business / Bot Name</label>
+                    <label>Silver Package Extra Plate</label>
+                    <input type="text" id="extra_silver" class="form-control" value="Rs. 4,170.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+                <div class="form-group">
+                    <label>Gold Package Extra Plate</label>
+                    <input type="text" id="extra_gold" class="form-control" value="Rs. 4,770.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+                <div class="form-group">
+                    <label>Premier Menu Extra Plate</label>
+                    <input type="text" id="extra_premier" class="form-control" value="Rs. 5,370.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+            </div>
+
+            <!-- Per Head Rate Breakdown -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-users"></i>
+                    <h2>Hall Per-Head Rates (LKR / Person)</h2>
+                </div>
+                <div class="form-group">
+                    <label>Starlight Ballroom Rates</label>
+                    <input type="text" id="perhead_starlight" class="form-control" value="Silver: Rs. 3,395.00 | Gold: Rs. 3,895.00 | Premier: Rs. 4,795.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+                <div class="form-group">
+                    <label>Grand Ballroom Rates (150 Pax - 200 Pax)</label>
+                    <input type="text" id="perhead_grand_150_200" class="form-control" value="Silver: Rs. 3,595.00 | Gold: Rs. 4,095.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+                <div class="form-group">
+                    <label>More Than 200 Pax Rates (All Halls)</label>
+                    <input type="text" id="perhead_200_plus" class="form-control" value="Silver: Rs. 3,395.00 | Gold: Rs. 3,895.00" onchange="autoGenerateKnowledgeBase()">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. System Prompt & Live Knowledge Base Memory -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-brain"></i>
+                <h2>AI Bot Master Training Knowledge Base (Auto-Generated)</h2>
+            </div>
+            
+            <div class="grid-2" style="margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label>Bot / Business Name</label>
                     <input type="text" id="businessName" class="form-control" value="Wasala Nature Resort - Banquet & Events">
                 </div>
-
-                <div class="price-grid">
-                    <div class="form-group">
-                        <label>Gold Buffet (Per Head)</label>
-                        <div class="input-icon-group">
-                            <span>LKR</span>
-                            <input type="number" id="priceGold" class="form-control" value="5500" oninput="syncToKnowledgeBase()">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Platinum Luxury (Per Head)</label>
-                        <div class="input-icon-group">
-                            <span>LKR</span>
-                            <input type="number" id="pricePlatinum" class="form-control" value="7500" oninput="syncToKnowledgeBase()">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="price-grid">
-                    <div class="form-group">
-                        <label>Silver Budget (Per Head)</label>
-                        <div class="input-icon-group">
-                            <span>LKR</span>
-                            <input type="number" id="priceSilver" class="form-control" value="4200" oninput="syncToKnowledgeBase()">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Corporate Rate (Per Head)</label>
-                        <div class="input-icon-group">
-                            <span>LKR</span>
-                            <input type="number" id="priceCorporate" class="form-control" value="3800" oninput="syncToKnowledgeBase()">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Wedding PDF Brochure Link</label>
-                    <input type="url" id="brochureUrl" class="form-control" value="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" oninput="syncToKnowledgeBase()">
-                </div>
-
                 <div class="form-group">
                     <label>Human Manager Handoff Phone Number</label>
                     <input type="text" id="handoffNumber" class="form-control" value="+94779998877">
                 </div>
             </div>
 
-            <!-- Knowledge Base Raw Editor -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-brain"></i>
-                    <h2>AI Bot Training Knowledge Base</h2>
-                </div>
+            <div class="form-group">
+                <label>AI System Instructions / Persona Prompt</label>
+                <input type="text" id="systemPrompt" class="form-control" value="You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. Answer guests warmly and accurately in English, Sinhala, or Singlish with official package prices.">
+            </div>
 
-                <div class="form-group">
-                    <label>System Persona Prompt</label>
-                    <input type="text" id="systemPrompt" class="form-control" value="You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. Respond warmly in English, Sinhala, or Singlish.">
-                </div>
-
-                <div class="form-group">
-                    <label>Full Training Memory (Knowledge Base)</label>
-                    <textarea id="knowledgeBase" class="form-control"></textarea>
-                </div>
+            <div class="form-group">
+                <label>Full Training Memory Text (Used by AI Bot to Answer Guests)</label>
+                <textarea id="knowledgeBase" class="form-control"></textarea>
             </div>
         </div>
 
@@ -409,6 +528,95 @@
     <script>
         const API_URL = '/api/tenants/1';
 
+        function autoGenerateKnowledgeBase() {
+            const s100g = document.getElementById('silver_100_grand').value;
+            const s100s = document.getElementById('silver_100_star').value;
+            const s150g = document.getElementById('silver_150_grand').value;
+            const s150s = document.getElementById('silver_150_star').value;
+            const s200 = document.getElementById('silver_200').value;
+            const s250 = document.getElementById('silver_250').value;
+            const s300 = document.getElementById('silver_300').value;
+
+            const g100g = document.getElementById('gold_100_grand').value;
+            const g100s = document.getElementById('gold_100_star').value;
+            const g150g = document.getElementById('gold_150_grand').value;
+            const g150s = document.getElementById('gold_150_star').value;
+            const g200 = document.getElementById('gold_200').value;
+            const g250 = document.getElementById('gold_250').value;
+            const g300 = document.getElementById('gold_300').value;
+
+            const p100g = document.getElementById('premier_100_grand').value;
+            const p100s = document.getElementById('premier_100_star').value;
+            const p150g = document.getElementById('premier_150_grand').value;
+            const p150s = document.getElementById('premier_150_star').value;
+            const p200 = document.getElementById('premier_200').value;
+            const p250 = document.getElementById('premier_250').value;
+            const p300 = document.getElementById('premier_300').value;
+
+            const exSilver = document.getElementById('extra_silver').value;
+            const exGold = document.getElementById('extra_gold').value;
+            const exPremier = document.getElementById('extra_premier').value;
+
+            const phStar = document.getElementById('perhead_starlight').value;
+            const phGrand = document.getElementById('perhead_grand_150_200').value;
+            const ph200Plus = document.getElementById('perhead_200_plus').value;
+
+            const kb = `=== WASALA NATURE RESORT - BANQUET & EVENTS MASTER KNOWLEDGE BASE ===
+
+🏛️ BANQUET HALLS AVAILABLE:
+1. Grand Ballroom (Capacity 150-650 guests)
+2. Starlight Ballroom (Capacity 100-350 guests)
+
+📊 OFFICIAL BANQUET PACKAGE PRICING MATRIX:
+
+SILVER MENU PACKAGES:
+- 100 Pax (Grand Ballroom): ${s100g}
+- 100 Pax (Starlight Ballroom): ${s100s}
+- 150 Pax (Grand Ballroom): ${s150g}
+- 150 Pax (Starlight Ballroom): ${s150s}
+- 200 Pax: ${s200}
+- 250 Pax: ${s250}
+- 300 Pax: ${s300}
+
+GOLD MENU PACKAGES:
+- 100 Pax (Grand Ballroom): ${g100g}
+- 100 Pax (Starlight Ballroom): ${g100s}
+- 150 Pax (Grand Ballroom): ${g150g}
+- 150 Pax (Starlight Ballroom): ${g150s}
+- 200 Pax: ${g200}
+- 250 Pax: ${g250}
+- 300 Pax: ${g300}
+
+PREMIER MENU PACKAGES:
+- 100 Pax (Grand Ballroom): ${p100g}
+- 100 Pax (Starlight Ballroom): ${p100s}
+- 150 Pax (Grand Ballroom): ${p150g}
+- 150 Pax (Starlight Ballroom): ${p150s}
+- 200 Pax: ${p200}
+- 250 Pax: ${p250}
+- 300 Pax: ${p300}
+
+🍽️ EXTRA PLATE RATES (PER EXTRA GUEST):
+- Silver Package Extra Plate: ${exSilver}
+- Gold Package Extra Plate: ${exGold}
+- Premier Menu Extra Plate: ${exPremier}
+
+👥 PER-HEAD BREAKDOWN RATES:
+- Starlight Ballroom: ${phStar}
+- Grand Ballroom (150Pax - 200Pax): ${phGrand}
+- More Than 200Pax (All Halls): ${ph200Plus}
+
+📄 OFFICIAL BROCHURE PDF:
+- 2026 Wedding & Banquet Package Brochure: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+
+📋 POLICIES:
+- Advance Booking Deposit: 25% to hold date.
+- Free Corkage for hard liquor if soft drinks purchased from hotel.
+- Music Cut-off Time: 11:30 PM.`;
+
+            document.getElementById('knowledgeBase').value = kb;
+        }
+
         async function loadTenantData() {
             try {
                 const res = await fetch(API_URL);
@@ -416,41 +624,18 @@
                     const data = await res.json();
                     document.getElementById('businessName').value = data.business_name || '';
                     document.getElementById('systemPrompt').value = data.system_prompt || '';
-                    document.getElementById('knowledgeBase').value = data.knowledge_base || '';
+                    if (data.knowledge_base) {
+                        document.getElementById('knowledgeBase').value = data.knowledge_base;
+                    } else {
+                        autoGenerateKnowledgeBase();
+                    }
                     document.getElementById('handoffNumber').value = data.human_handoff_number || '';
-                    showToast('Data reloaded from server');
+                    showToast('Data loaded successfully!');
                 }
             } catch (err) {
                 console.error('Failed to load data:', err);
+                autoGenerateKnowledgeBase();
             }
-        }
-
-        function syncToKnowledgeBase() {
-            const gold = document.getElementById('priceGold').value;
-            const platinum = document.getElementById('pricePlatinum').value;
-            const silver = document.getElementById('priceSilver').value;
-            const corporate = document.getElementById('priceCorporate').value;
-            const brochure = document.getElementById('brochureUrl').value;
-
-            const kbText = `=== WASALA NATURE RESORT - BANQUET & EVENTS MASTER KNOWLEDGE BASE ===
-
-🏛️ BANQUET HALLS & SEATING CAPACITY:
-1. Grand Royal Ballroom: Up to 650 guests (Banquet setup) | AC, Chandeliers, Stage, Bridal Suite.
-2. Lotus Pavilion (Outdoor Lakefront Venue): Up to 350 guests | Open-air lakefront view.
-
-🍽️ WEDDING & BANQUET PACKAGES (Per Head Pricing):
-- Gold Buffet Package: LKR ${gold} net per head (Welcome Drink, Buffet, Desserts, Bridal Room)
-- Platinum Luxury Package: LKR ${platinum} net per head (Seafood & Meat Buffet, Live Stations, Honeymoon Suite)
-- Silver Budget Package: LKR ${silver} net per head (Welcome Drink, Fried Rice, Chicken, Ice Cream)
-- Corporate Conference Package: LKR ${corporate} net per head (Teas, Lunch, Projector, Sound)
-
-📄 OFFICIAL BROCHURES & DOCUMENTS:
-- 2026 Wedding Packages Brochure PDF: ${brochure}
-
-📋 POLICIES:
-- Booking Deposit: 25% to hold date. Noise cutoff: 11:30 PM.`;
-
-            document.getElementById('knowledgeBase').value = kbText;
         }
 
         async function saveTenantData() {
@@ -486,9 +671,11 @@
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
-        // Initialize on load
         window.addEventListener('DOMContentLoaded', () => {
             loadTenantData();
+            if (!document.getElementById('knowledgeBase').value) {
+                autoGenerateKnowledgeBase();
+            }
         });
     </script>
 </body>
