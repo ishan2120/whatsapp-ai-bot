@@ -101,14 +101,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Setup
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from fastapi.staticfiles import StaticFiles
+
+# Mount static folder for serving PDFs, images, and admin interface
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 import os
@@ -264,6 +260,28 @@ async def process_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                         user_message=user_text
                     )
 
+                    # Check if response contains document tags: [SEND_DOC: url | filename | caption]
+                    doc_to_send = None
+                    if "[SEND_DOC:" in ai_reply:
+                        try:
+                            start_idx = ai_reply.index("[SEND_DOC:")
+                            end_idx = ai_reply.index("]", start_idx)
+                            doc_tag = ai_reply[start_idx:end_idx + 1]
+                            # Clean response text
+                            ai_reply_clean = ai_reply.replace(doc_tag, "").strip()
+                            
+                            # Parse tag params: [SEND_DOC: url | filename | caption]
+                            params_str = doc_tag[10:-1].strip()
+                            parts = [p.strip() for p in params_str.split("|")]
+                            doc_url = parts[0] if len(parts) > 0 else ""
+                            filename = parts[1] if len(parts) > 1 else "Document.pdf"
+                            caption = parts[2] if len(parts) > 2 else filename
+                            
+                            doc_to_send = {"url": doc_url, "filename": filename, "caption": caption}
+                            ai_reply = ai_reply_clean
+                        except Exception as tag_err:
+                            logger.error(f"Error parsing document tag: {tag_err}")
+
                     # Store user message & AI response in database
                     user_history = ChatHistory(
                         tenant_id=tenant.id,
@@ -288,6 +306,18 @@ async def process_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                         message_text=ai_reply,
                         meta_access_token=tenant.meta_access_token
                     )
+
+                    # Send attached PDF document if triggered
+                    if doc_to_send and doc_to_send["url"]:
+                        logger.info(f"Sending PDF document to {customer_phone}: {doc_to_send['filename']}")
+                        await send_whatsapp_document(
+                            phone_number_id=tenant.whatsapp_phone_number_id,
+                            recipient_phone=customer_phone,
+                            document_url=doc_to_send["url"],
+                            filename=doc_to_send["filename"],
+                            caption=doc_to_send["caption"],
+                            meta_access_token=tenant.meta_access_token
+                        )
 
                     # Handle Human Handoff if requested
                     if is_handoff_requested and tenant.human_handoff_number:

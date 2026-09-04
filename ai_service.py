@@ -6,70 +6,69 @@ from config import settings
 
 logger = logging.getLogger("uvicorn.error")
 
+PDF_PRICE_LIST_URL = "https://whatsapp-ai-bot-3f6n.onrender.com/static/pdfs/Price_List.pdf"
+PDF_BANQUETS_URL = "https://whatsapp-ai-bot-3f6n.onrender.com/static/pdfs/Wasala_Banquets.pdf"
+PDF_REGI_URL = "https://whatsapp-ai-bot-3f6n.onrender.com/static/pdfs/REGI_2026.pdf"
+
 def get_openai_client() -> AsyncOpenAI:
     return AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 def smart_knowledge_base_search(user_message: str, knowledge_base: str, system_prompt: str) -> str:
     """
-    Smart Local Knowledge-Base AI Simulator.
-    Extracts relevant facts from tenant knowledge base matching user questions
-    in English, Sinhala, or Singlish.
+    Smart Local Knowledge-Base AI Simulator with Multilingual PDF Document Triggers.
+    Matches queries in English, Sinhala, or Singlish and attaches official PDFs.
     """
     msg = user_message.lower().strip()
     kb_lines = [line.strip() for line in knowledge_base.split("\n") if line.strip()]
 
     # Detect language intent
-    is_singlish = any(w in msg for w in ["macho", "thiyenawada", "kohomada", "gaana", "kiyada", "ekak", "apita", "hari", "sinhala"])
+    is_singlish = any(w in msg for w in ["macho", "thiyenawada", "kohomada", "gaana", "kiyada", "ekak", "apita", "hari", "sinhala", "ewanna"])
     is_sinhala = any('\u0d80' <= c <= '\u0dff' for c in user_message)
 
     # Human handoff check
     is_handoff_words = any(w in msg for w in ["human", "agent", "manager", "person", "staff", "receptionist", "call", "help me"])
 
+    # Document Trigger Checks
+    pdf_tag = ""
+    if any(w in msg for w in ["registration", "register", "regi", "civil", "2026 regi", "රෙජිස්ට්‍රේෂන්", "රෙජිස්ටර්"]):
+        pdf_tag = f" [SEND_DOC: {PDF_REGI_URL} | REGI 2026.pdf | Wasala Nature Resort - Registration Packages 2026]"
+    elif any(w in msg for w in ["menu", "items", "compliment", "complimentary", "terms", "policy", "policies", "details", "banquet", "කෑම", "මෙන්නු", "කොන්දේසි"]):
+        pdf_tag = f" [SEND_DOC: {PDF_BANQUETS_URL} | Wasala Banquets.pdf | Wasala Nature Resort - Full Banquet & Menu Details]"
+    elif any(w in msg for w in ["price", "prices", "list", "cost", "quotation", "rate", "rates", "budget", "ගණන්", "මිල", "ලැයිස්තුව", "ganan", "mila"]):
+        pdf_tag = f" [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Official Wedding Price List]"
+
     # Match topic keywords
     matched_lines = []
     
-    # 1. Room / Price / Booking queries
-    if any(w in msg for w in ["room", "rate", "price", "cost", "booking", "villa", "suite", "deluxe", "gaana", "kiyada", "nawathena"]):
+    # 1. Price / Package queries
+    if any(w in msg for w in ["price", "prices", "rate", "cost", "pax", "silver", "gold", "premier", "ballroom", "starlight", "ganan", "kiyada"]):
         for line in kb_lines:
-            if any(k in line.lower() for k in ["room", "suite", "villa", "deluxe", "executive", "rate", "price", "rs.", "$"]):
+            if any(k in line.lower() for k in ["pax", "silver", "gold", "premier", "ballroom", "starlight", "plate", "per head", "rs.", "$"]):
                 matched_lines.append(f"• {line}")
 
-    # 2. Check-in / Check-out / Time queries
-    if any(w in msg for w in ["time", "check-in", "check in", "check-out", "checkout", "hours", "open", "welawa"]):
+    # 2. Details / Menu / Compliments queries
+    if any(w in msg for w in ["menu", "items", "compliment", "policy", "deposit", "corkage", "music", "detail"]):
         for line in kb_lines:
-            if any(k in line.lower() for k in ["check-in", "check-out", "hours", "open", "time"]):
+            if any(k in line.lower() for k in ["menu", "extra", "deposit", "corkage", "music", "policy", "brochure"]):
                 matched_lines.append(f"• {line}")
 
-    # 3. Location / Address queries
-    if any(w in msg for w in ["where", "location", "address", "kohedha", "place", "bentota", "kandy"]):
-        for line in kb_lines:
-            if any(k in line.lower() for k in ["location", "address", "road", "street", "city"]):
-                matched_lines.append(f"• {line}")
-
-    # 4. Dining / Menu / Food queries
-    if any(w in msg for w in ["food", "menu", "kottu", "rice", "curry", "restaurant", "buffet", "eat", "drink", "kema"]):
-        for line in kb_lines:
-            if any(k in line.lower() for k in ["menu", "food", "kottu", "rice", "curry", "buffet", "dining", "restaurant", "juice"]):
-                matched_lines.append(f"• {line}")
-
-    # If specific topic matched, build formatted response
+    # Build response
     if matched_lines:
-        details = "\n".join(matched_lines)
+        details = "\n".join(matched_lines[:6])
         if is_singlish:
-            response = f"✨ *Here are our details for you, Macho:*\n\n{details}\n\nAnything else you'd like to know?"
+            response = f"✨ *Here are your banquet & package details, Macho:*\n\n{details}\n\nI have also attached the PDF document for you below! 👇{pdf_tag}"
         elif is_sinhala:
-            response = f"✨ *ඔබගේ ප්‍රශ්නයට අදාළ තොරතුරු මෙන්න:*\n\n{details}\n\nතවත් යමක් දැනගැනීමට අවශ්‍යද?"
+            response = f"✨ *ඔබ ඉල්ලා සිටි මංගල පැකේජ විස්තර මෙන්න:*\n\n{details}\n\nමම ඔබ වෙනුවෙන් නිල PDF ලේඛනය පහතින් ලබා දී ඇත! 👇{pdf_tag}"
         else:
-            response = f"✨ *Thank you for reaching out! Here is the information you requested:*\n\n{details}\n\nHow else may we assist you today?"
+            response = f"✨ *Thank you for reaching out to Wasala Nature Resort! Here are the requested details:*\n\n{details}\n\nI have also attached the official PDF brochure for you below! 👇{pdf_tag}"
     else:
-        # Fallback to general knowledge base summary
         summary = "\n".join([f"• {line}" for line in kb_lines[:5]])
         if is_singlish:
-            response = f"👋 *Welcome! Here is our key information, Macho:*\n\n{summary}\n\nPlease ask any specific question!"
+            response = f"👋 *Welcome to Wasala Nature Resort, Macho!*\n\n{summary}\n\nAttached is the requested PDF brochure for you! 👇{pdf_tag}"
         elif is_sinhala:
-            response = f"👋 *ආයුබෝවන්! අපගේ විස්තර මෙන්න:*\n\n{summary}\n\nකරුණාකර ඕනෑම ප්‍රශ්නයක් අහන්න!"
+            response = f"👋 *සාදරයෙන් පිළිගනිමු! අපගේ මංගල පැකේජ විස්තර මෙන්න:*\n\n{summary}\n\nඅදාළ PDF ලේඛනය පහතින් අමුණා ඇත! 👇{pdf_tag}"
         else:
-            response = f"👋 *Welcome! Here is our information:*\n\n{summary}\n\nPlease let us know how we can help you!"
+            response = f"👋 *Welcome to Wasala Nature Resort - Banquet & Events!*\n\n{summary}\n\nPlease find the attached official PDF document below! 👇{pdf_tag}"
 
     if is_handoff_words:
         response += "\n\n🚨 *A front desk manager has been notified to assist you directly.* [HUMAN_HANDOFF_REQUESTED]"
@@ -99,11 +98,23 @@ async def generate_ai_response(
     # Attempt OpenAI gpt-4o-mini API call
     try:
         client = AsyncOpenAI(api_key=api_key)
+        pdf_instructions = (
+            "\n\n--- MULTILINGUAL PDF AUTOMATION RULES ---\n"
+            "If the user asks (in English, Sinhala, or Singlish) about:\n"
+            "1. WEDDING PACKAGE PRICES / RATES / COST / QUOTATIONS:\n"
+            f"   Append exactly: [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Wedding Price List 2026]\n"
+            "2. MENU ITEMS / COMPLIMENTARY BENEFITS / TERMS / POLICIES / BANQUET DETAILS:\n"
+            f"   Append exactly: [SEND_DOC: {PDF_BANQUETS_URL} | Wasala Banquets.pdf | Wasala Nature Resort - Full Banquet & Menu Details]\n"
+            "3. REGISTRATION PACKAGES / CIVIL REGISTRATION / 2026 REGISTRATION RATES:\n"
+            f"   Append exactly: [SEND_DOC: {PDF_REGI_URL} | REGI 2026.pdf | Wasala Nature Resort - Registration Packages 2026]\n"
+            "------------------------------------------\n"
+        )
         full_system_instructions = (
             f"{system_prompt}\n\n"
             f"--- KNOWLEDGE BASE ---\n"
             f"{knowledge_base}\n"
             f"----------------------\n"
+            f"{pdf_instructions}"
         )
         messages = [{"role": "system", "content": full_system_instructions}]
         for msg in chat_history[-10:]:
