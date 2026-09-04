@@ -33,11 +33,12 @@ async def lifespan(app: FastAPI):
     async with AsyncSessionLocal() as session:
         stmt = select(Tenant).where(Tenant.whatsapp_phone_number_id == "1157440684128924")
         existing = (await session.execute(stmt)).scalar_one_or_none()
+        NEW_TOKEN = "EAAjfYY4wqiYBSWivwPb8V5cB6wbqZC0b2pLr6fjzTAuVqfU57FQc5V7fd4uYCZCFnzCUwHAF0sRqmQCnsAgjVnWrAsvLgHZAalZBwgRg2fONnit5IZBrx8Sdnyf91C8StvHrM5RBaPIzfQKJMgR3P3veTRi6gtfZA1jO38zUirUPdTpUjGRAxN7KGEZBSuuihrLsQZDZD"
         if not existing:
             wasala_tenant = Tenant(
                 business_name="Wasala Nature Resort - Banquet & Events",
                 whatsapp_phone_number_id="1157440684128924",
-                meta_access_token="EAAjfYY4wqiYBSThnYrP7631PGyrcuBgrNoQvITTe1HtEJRIr8C8D2ZBQFOw59hdVhyiFoqd45ANOHgPhk4D7I3j95bAWmor5JNJgvqZB2Evny4zd1K5uC6yOGvSynoAj1t7n43ZCA2BLI8NqwXFXMSs0ney9IbncFkaopKBVXOyCGBE2w8luVzYbswCwJOYozXBcT5vVaO1nJN6qzdvIzmKF2BcIfsz1D7OgBEMmwxuj5vYEfkyUqXlVYAG7k6JprgO7VjUHLelLLpAuRls9p2HpAZDZD",
+                meta_access_token=NEW_TOKEN,
                 system_prompt=(
                     "You are the senior Banquet & Event Planning AI Consultant for Wasala Nature Resort in Bentota, Sri Lanka. "
                     "Answer guests warmly and accurately in English, Sinhala, or Singlish with official package prices."
@@ -90,6 +91,10 @@ async def lifespan(app: FastAPI):
             session.add(wasala_tenant)
             await session.commit()
             logger.info("Successfully auto-seeded Wasala Nature Resort tenant into database!")
+        else:
+            existing.meta_access_token = NEW_TOKEN
+            await session.commit()
+            logger.info("Successfully updated Meta access token for existing tenant in database!")
 
     yield
     logger.info("Shutting down WhatsApp AI Chatbot service...")
