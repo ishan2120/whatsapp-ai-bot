@@ -38,8 +38,8 @@ def smart_knowledge_base_search(user_message: str, knowledge_base: str, system_p
         pdf_tag = f" [SEND_DOC: {PDF_BANQUETS_URL} | Wasala Banquets.pdf | Wasala Nature Resort - Full Banquet & Menu Details]"
     elif any(w in msg for w in ["price", "prices", "list", "cost", "quotation", "rate", "rates", "budget", "ගණන්", "මිල", "ලැයිස්තුව", "ganan", "mila"]):
         pdf_tag = f" [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Official Wedding Price List]"
-    elif any(w in msg for w in pdf_keywords):
-        # Default to Price List PDF if general PDF/document/file is requested
+    else:
+        # Default to Price List PDF for all general messages/greetings so a PDF is ALWAYS attached
         pdf_tag = f" [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Official Wedding Price List]"
 
     # Match topic keywords
