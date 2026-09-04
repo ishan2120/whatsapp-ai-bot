@@ -30,11 +30,16 @@ def smart_knowledge_base_search(user_message: str, knowledge_base: str, system_p
 
     # Document Trigger Checks
     pdf_tag = ""
+    pdf_keywords = ["pdf", "brochure", "document", "file", "send", "share", "ewanna", "එවන්න", "ලබාදෙන්න", "ලැබෙන්න", "as well", "also", "please", "need"]
+    
     if any(w in msg for w in ["registration", "register", "regi", "civil", "2026 regi", "රෙජිස්ට්‍රේෂන්", "රෙජිස්ටර්"]):
         pdf_tag = f" [SEND_DOC: {PDF_REGI_URL} | REGI 2026.pdf | Wasala Nature Resort - Registration Packages 2026]"
     elif any(w in msg for w in ["menu", "items", "compliment", "complimentary", "terms", "policy", "policies", "details", "banquet", "කෑම", "මෙන්නු", "කොන්දේසි"]):
         pdf_tag = f" [SEND_DOC: {PDF_BANQUETS_URL} | Wasala Banquets.pdf | Wasala Nature Resort - Full Banquet & Menu Details]"
     elif any(w in msg for w in ["price", "prices", "list", "cost", "quotation", "rate", "rates", "budget", "ගණන්", "මිල", "ලැයිස්තුව", "ganan", "mila"]):
+        pdf_tag = f" [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Official Wedding Price List]"
+    elif any(w in msg for w in pdf_keywords):
+        # Default to Price List PDF if general PDF/document/file is requested
         pdf_tag = f" [SEND_DOC: {PDF_PRICE_LIST_URL} | Price List.pdf | Wasala Nature Resort - Official Wedding Price List]"
 
     # Match topic keywords
@@ -53,22 +58,26 @@ def smart_knowledge_base_search(user_message: str, knowledge_base: str, system_p
                 matched_lines.append(f"• {line}")
 
     # Build response
+    pdf_note_en = "\n\nI have also attached the official PDF brochure for you below! 👇" if pdf_tag else ""
+    pdf_note_si = "\n\nමම ඔබ වෙනුවෙන් නිල PDF ලේඛනය පහතින් ලබා දී ඇත! 👇" if pdf_tag else ""
+    pdf_note_sg = "\n\nI have attached the PDF document for you below, Macho! 👇" if pdf_tag else ""
+
     if matched_lines:
         details = "\n".join(matched_lines[:6])
         if is_singlish:
-            response = f"✨ *Here are your banquet & package details, Macho:*\n\n{details}\n\nI have also attached the PDF document for you below! 👇{pdf_tag}"
+            response = f"✨ *Here are your banquet & package details, Macho:*\n\n{details}{pdf_note_sg}{pdf_tag}"
         elif is_sinhala:
-            response = f"✨ *ඔබ ඉල්ලා සිටි මංගල පැකේජ විස්තර මෙන්න:*\n\n{details}\n\nමම ඔබ වෙනුවෙන් නිල PDF ලේඛනය පහතින් ලබා දී ඇත! 👇{pdf_tag}"
+            response = f"✨ *ඔබ ඉල්ලා සිටි මංගල පැකේජ විස්තර මෙන්න:*\n\n{details}{pdf_note_si}{pdf_tag}"
         else:
-            response = f"✨ *Thank you for reaching out to Wasala Nature Resort! Here are the requested details:*\n\n{details}\n\nI have also attached the official PDF brochure for you below! 👇{pdf_tag}"
+            response = f"✨ *Thank you for reaching out to Wasala Nature Resort! Here are the requested details:*\n\n{details}{pdf_note_en}{pdf_tag}"
     else:
         summary = "\n".join([f"• {line}" for line in kb_lines[:5]])
         if is_singlish:
-            response = f"👋 *Welcome to Wasala Nature Resort, Macho!*\n\n{summary}\n\nAttached is the requested PDF brochure for you! 👇{pdf_tag}"
+            response = f"👋 *Welcome to Wasala Nature Resort, Macho!*\n\n{summary}{pdf_note_sg}{pdf_tag}"
         elif is_sinhala:
-            response = f"👋 *සාදරයෙන් පිළිගනිමු! අපගේ මංගල පැකේජ විස්තර මෙන්න:*\n\n{summary}\n\nඅදාළ PDF ලේඛනය පහතින් අමුණා ඇත! 👇{pdf_tag}"
+            response = f"👋 *සාදරයෙන් පිළිගනිමු! අපගේ මංගල පැකේජ විස්තර මෙන්න:*\n\n{summary}{pdf_note_si}{pdf_tag}"
         else:
-            response = f"👋 *Welcome to Wasala Nature Resort - Banquet & Events!*\n\n{summary}\n\nPlease find the attached official PDF document below! 👇{pdf_tag}"
+            response = f"👋 *Welcome to Wasala Nature Resort - Banquet & Events!*\n\n{summary}{pdf_note_en}{pdf_tag}"
 
     if is_handoff_words:
         response += "\n\n🚨 *A front desk manager has been notified to assist you directly.* [HUMAN_HANDOFF_REQUESTED]"
