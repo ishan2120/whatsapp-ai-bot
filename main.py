@@ -314,15 +314,19 @@ async def process_webhook(request: Request, db: AsyncSession = Depends(get_db)):
 
                     # Send attached PDF document if triggered
                     if doc_to_send and doc_to_send["url"]:
-                        logger.info(f"Sending PDF document to {customer_phone}: {doc_to_send['filename']}")
-                        await send_whatsapp_document(
-                            phone_number_id=tenant.whatsapp_phone_number_id,
-                            recipient_phone=customer_phone,
-                            document_url=doc_to_send["url"],
-                            filename=doc_to_send["filename"],
-                            caption=doc_to_send["caption"],
-                            meta_access_token=tenant.meta_access_token
-                        )
+                        logger.info(f"Sending PDF document to {customer_phone}: {doc_to_send['filename']} from URL {doc_to_send['url']}")
+                        try:
+                            doc_res = await send_whatsapp_document(
+                                phone_number_id=tenant.whatsapp_phone_number_id,
+                                recipient_phone=customer_phone,
+                                document_url=doc_to_send["url"],
+                                filename=doc_to_send["filename"],
+                                caption=doc_to_send["caption"],
+                                meta_access_token=tenant.meta_access_token
+                            )
+                            logger.info(f"Successfully delivered PDF document to {customer_phone}: {doc_res}")
+                        except Exception as doc_err:
+                            logger.error(f"Failed to deliver PDF document to {customer_phone}: {doc_err}")
 
                     # Handle Human Handoff if requested
                     if is_handoff_requested and tenant.human_handoff_number:

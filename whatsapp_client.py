@@ -137,7 +137,7 @@ async def send_whatsapp_document(
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(url, json=payload, headers=headers, timeout=15.0)
+            response = await client.post(url, json=payload, headers=headers, timeout=90.0)
             response.raise_for_status()
             res_data = response.json()
             logger.info(f"Successfully sent WhatsApp document to {recipient_phone}. Response: {res_data}")
